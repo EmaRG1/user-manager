@@ -46,10 +46,9 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
       {/* Sidebar */}
       <aside 
-        className={`sidebar flex flex-col bg-white shadow fixed h-full overflow-y-auto z-60 w-64 ${
+        className={`sidebar flex flex-col bg-white shadow fixed h-[100svh]  pb-5 overflow-y-auto z-60 w-64 ${
           isOpen ? 'sidebar-open' : 'sidebar-closed md:sidebar-open'
         }`}
-        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       >
         {/* Botón cerrar en celulares */}
         <button 
@@ -68,14 +67,10 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         </div>
         
         {/* Links de navegación */}
-        <div className="flex-grow overflow-y-auto">
-          <NavigationLinks />
-        </div>
+        <NavigationLinks />
         
-        {/* Footer del sidebar - Ahora con flex-shrink-0 para que no se reduzca */}
-        <div className="flex-shrink-0 mt-auto">
-          <SidebarFooter />
-        </div>
+        {/* Footer del sidebar*/}
+        <SidebarFooter />
       </aside>
     </>
   );

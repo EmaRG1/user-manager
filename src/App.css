@@ -149,10 +149,8 @@ body.sidebar-open {
   .sidebar {
     transition: transform 0.3s ease;
     overflow-y: auto; /* Permitir scroll dentro del sidebar */
-    height: 100vh !important; /* Forzar altura completa */
+    height: 100vh;
     max-height: 100vh;
-    display: flex !important;
-    flex-direction: column !important;
   }
   
   .sidebar-closed {
@@ -161,14 +159,6 @@ body.sidebar-open {
   
   .sidebar-open {
     transform: translateX(0);
-  }
-
-  /* Asegurar que el footer del sidebar esté siempre visible */
-  .sidebar > div:last-child {
-    position: sticky;
-    bottom: 0;
-    background-color: white;
-    z-index: 2;
   }
 }
 
