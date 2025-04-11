@@ -58,11 +58,14 @@ npm run dev
 
 - Usuario Administrador:
 
-  - Email: admin@example.com
+  - Email: admin@admin.com
   - Contraseña: admin123
 
 - Usuario Regular:
-  - Email: user@example.com
+  - Email: user@user.com
+  - Contraseña: user123
+ 
+  - Email: user2@user.com
   - Contraseña: user123
 
 ### Funcionalidades por rol
