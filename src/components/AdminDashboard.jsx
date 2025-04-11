@@ -135,6 +135,9 @@ export default function AdminDashboard() {
         const userAddresses = users.find(u => u.id === confirmDialog.userId)?.addresses || 0;
         return prevTotal - userAddresses;
       });
+      if (confirmDialog.userId === currentUser.id) {
+        navigate('/login');
+      }
       showToast('Usuario eliminado con éxito', 'info');
     } catch (error) {
       showToast('Error al eliminar usuario', 'error');

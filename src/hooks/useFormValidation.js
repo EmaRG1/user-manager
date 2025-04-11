@@ -25,6 +25,11 @@ export default function useFormValidation(initialValues, validationRules, onSubm
         return validationRules[name].required;
       }
       
+      // Validación especial para campos 'nombre'
+      if (name === 'name' && !/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]*$/.test(value)) {
+        return 'El nombre solo puede contener letras y espacios';
+      }
+      
       if (validationRules[name].pattern && !validationRules[name].pattern.regex.test(value)) {
         return validationRules[name].pattern.message;
       }
@@ -46,7 +51,19 @@ export default function useFormValidation(initialValues, validationRules, onSubm
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    const fieldValue = type === 'checkbox' ? checked : value;
+    let fieldValue = type === 'checkbox' ? checked : value;
+    
+    // Validación para campos 'nombre': solo texto y primera letra de cada palabra en mayúscula
+    if (name === 'name') {
+      // Verificar si el valor tiene solo texto (letras y espacios)
+      if (/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]*$/.test(value)) {
+        // Capitalizar la primera letra de cada palabra
+        fieldValue = value.replace(/\b\w/g, (char) => char.toUpperCase());
+      } else {
+        // Si contiene caracteres no permitidos, mantener el valor anterior sin el último caracter
+        fieldValue = value.slice(0, -1);
+      }
+    }
     
     setFormData(prev => ({
       ...prev,

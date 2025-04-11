@@ -2,91 +2,34 @@ import { useState, useEffect } from 'react';
 import { Edit, Save } from 'lucide-react';
 import { usersApi } from '../../api/mockApi';
 import { useToast } from '../../context/ToastContext';
+import useFormValidation from '../../hooks/useFormValidation';
 
 export default function ProfileInfo({ user, role, updateUser }) {
-  const [profileData, setProfileData] = useState({
-    name: '',
-    email: ''
-  });
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const [errors, setErrors] = useState({
-    name: '',
-    email: ''
-  });
   const { showToast } = useToast();
 
-  // Inicializar datos del perfil
-  useEffect(() => {
-    if (user) {
-      setProfileData({
-        name: user.name || '',
-        email: user.email || ''
-      });
-    }
-  }, [user]);
-
-  const handleProfileChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Validación en tiempo real
-    validateField(name, value);
+  const initialValues = {
+    name: user?.name || '',
+    email: user?.email || ''
   };
 
-  // Validar un campo específico
-  const validateField = (name, value) => {
-    let message = '';
-    switch (name) {
-      case 'name':
-        if (!value.trim()) {
-          message = 'El nombre es obligatorio';
-        }
-        break;
-      case 'email':
-        if (!value.trim()) {
-          message = 'El correo electrónico es obligatorio';
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-          message = 'El correo electrónico no es válido';
-        }
-        break;
-      default:
-        break;
+  const validationRules = {
+    name: {
+      required: 'El nombre es obligatorio'
+    },
+    email: {
+      required: 'El correo electrónico es obligatorio',
+      pattern: {
+        regex: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: 'El correo electrónico no es válido'
+      }
     }
-    
-    setErrors(prev => ({
-      ...prev,
-      [name]: message
-    }));
-  };
-
-  // Validar todos los campos
-  const validateAllFields = () => {
-    // Validar cada campo
-    validateField('name', profileData.name);
-    validateField('email', profileData.email);
-    
-    // Verificar si hay errores
-    const hasErrors = !!(errors.name || errors.email || 
-                        !profileData.name.trim() || 
-                        !profileData.email.trim() || 
-                        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(profileData.email));
-    
-    return !hasErrors;
   };
 
   // Guardar cambios en el perfil
-  const handleSaveProfile = async () => {
+  const handleSaveProfile = async (formData) => {
     if (!user || !user.id) return;
-    
-    // Validar todos los campos antes de enviar
-    if (!validateAllFields()) {
-      showToast('Por favor, corrija los errores antes de guardar', 'error'); 
-      return;
-    }
     
     setIsSavingProfile(true);
     try {
@@ -96,7 +39,7 @@ export default function ProfileInfo({ user, role, updateUser }) {
       }
 
       // Actualizar perfil en la API
-      const updatedUser = await usersApi.update(user.id, profileData, token);
+      const updatedUser = await usersApi.update(user.id, formData, token);
       
       // Actualizar el contexto de autenticación
       updateUser(updatedUser);
@@ -112,6 +55,31 @@ export default function ProfileInfo({ user, role, updateUser }) {
     }
   };
 
+  const { 
+    formData, 
+    errors, 
+    handleChange, 
+    handleBlur,
+    handleSubmit,
+    setFormData,
+    setErrors
+  } = useFormValidation(
+    initialValues,
+    validationRules,
+    handleSaveProfile,
+    { userId: user?.id }
+  );
+
+  // Actualizar formulario cuando cambia el usuario
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        email: user.email || ''
+      });
+    }
+  }, [user, setFormData]);
+
   return (
     <div className="bg-white shadow p-6 rounded-lg">
       <div className="flex flex-wrap justify-between items-center mb-6">
@@ -123,7 +91,7 @@ export default function ProfileInfo({ user, role, updateUser }) {
           <div className="flex space-x-2">
             <button 
               className="flex items-center bg-black hover:bg-gray-800 px-4 py-2 rounded-md text-white"
-              onClick={handleSaveProfile}
+              onClick={handleSubmit}
               disabled={isSavingProfile}
             >
               <Save className="mr-2 w-5 h-5" />
@@ -133,14 +101,11 @@ export default function ProfileInfo({ user, role, updateUser }) {
               className="flex items-center bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-md text-gray-700"
               onClick={() => {
                 setIsEditingProfile(false);
-                setProfileData({
+                setFormData({
                   name: user.name || '',
                   email: user.email || ''
                 });
-                setErrors({
-                  name: '',
-                  email: ''
-                });
+                setErrors({});
               }}
               disabled={isSavingProfile}
             >
@@ -167,9 +132,9 @@ export default function ProfileInfo({ user, role, updateUser }) {
             type="text" 
                 name="name"
                 className={`p-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md w-full`}
-                value={profileData.name} 
-                onChange={handleProfileChange}
-                onBlur={(e) => validateField('name', e.target.value)}
+                value={formData.name} 
+                onChange={handleChange}
+                onBlur={handleBlur}
                 disabled={isSavingProfile}
               />
               {errors.name && (
@@ -189,9 +154,9 @@ export default function ProfileInfo({ user, role, updateUser }) {
             type="email" 
                 name="email"
                 className={`p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md w-full`}
-                value={profileData.email} 
-                onChange={handleProfileChange}
-                onBlur={(e) => validateField('email', e.target.value)}
+                value={formData.email} 
+                onChange={handleChange}
+                onBlur={handleBlur}
                 disabled={isSavingProfile}
               />
               {errors.email && (
