@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "street": "Av. Aconquija 1254",
+    "city": "Yerba Buena",
+    "state": "Tucumán",
+    "zipCode": "T4107",
+    "country": "Argentina"
+  },
+  {
+    "id": 2,
+    "userId": 2,
+    "street": "San Martín 821",
+    "city": "San Miguel de Tucumán",
+    "state": "Tucumán",
+    "zipCode": "T4000",
+    "country": "Argentina"
+  },
+  {
+    "id": 3,
+    "userId": 3,
+    "street": "Av. Mate de Luna 2187",
+    "city": "San Miguel de Tucumán",
+    "state": "Tucumán",
+    "zipCode": "T4000",
+    "country": "Argentina"
+  }
+] 

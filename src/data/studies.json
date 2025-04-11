@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "title": "Ingeniería en Sistemas",
+    "institution": "Universidad Tecnológica Nacional - Facultad Regional Tucumán",
+    "degree": "Licenciatura",
+    "fieldOfStudy": "Desarrollo de Software",
+    "startYear": "2015",
+    "endYear": "2019",
+    "description": "Especialización en arquitectura de software y desarrollo de aplicaciones",
+    "currentlyStudying": false
+  },
+  {
+    "id": 2,
+    "userId": 2,
+    "title": "Administración de Empresas",
+    "institution": "Universidad Nacional de Tucumán - Facultad de Ciencias Económicas",
+    "degree": "Maestría",
+    "fieldOfStudy": "Finanzas Corporativas",
+    "startYear": "2016",
+    "endYear": "2020",
+    "description": "Enfoque en finanzas corporativas y análisis de inversiones",
+    "currentlyStudying": false
+  },
+  {
+    "id": 3,
+    "userId": 3,
+    "title": "Psicología",
+    "institution": "Universidad Nacional de Tucumán - Facultad de Psicología",
+    "degree": "Licenciatura",
+    "fieldOfStudy": "Psicología Clínica",
+    "startYear": "2018",
+    "endYear": "",
+    "description": "Especialización en terapia cognitivo-conductual y atención primaria",
+    "currentlyStudying": true
+  }
+] 
