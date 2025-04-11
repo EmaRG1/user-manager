@@ -36,7 +36,6 @@ Una aplicación de página única (SPA) desarrollada con React que incluye auten
 
 ```bash
 git clone <url-repositorio>
-cd prueba-tecnica-zoco
 ```
 
 2. Instala las dependencias:
