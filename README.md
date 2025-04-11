@@ -95,6 +95,3 @@ src/
   └── main.jsx           # Punto de entrada de la aplicación
 ```
 
-## Despliegue
-
-La aplicación puede desplegarse en cualquier servicio de hosting estático como Vercel, Netlify o GitHub Pages.
