@@ -132,7 +132,7 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
                     <p className="mt-2 text-gray-600 text-sm break-words">{study.description}</p>
                   )}
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
                   <button 
                     className="flex-shrink-0 text-gray-600 hover:text-gray-900"
                     onClick={() => handleEditStudy(study)}

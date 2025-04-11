@@ -130,7 +130,7 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
                   <p className="mt-1 text-gray-500 text-sm break-words">{address.city}, {address.state}</p>
                   <p className="text-gray-500 text-sm">{address.zipCode}, {address.country}</p>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
                   <button 
                     className="flex-shrink-0 text-gray-600 hover:text-gray-900"
                     onClick={() => handleEditAddress(address)}
