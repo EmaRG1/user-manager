@@ -46,7 +46,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
 
       {/* Sidebar */}
       <aside 
-        className={`sidebar flex flex-col bg-white shadow fixed h-[100svh]  pb-5 overflow-y-auto z-60 w-64 ${
+        className={`sidebar flex flex-col bg-white shadow fixed h-[100svh] pb-20 md:pb-0 overflow-y-auto z-60 w-64 ${
           isOpen ? 'sidebar-open' : 'sidebar-closed md:sidebar-open'
         }`}
       >
