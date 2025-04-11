@@ -54,7 +54,7 @@ export default function useFormValidation(initialValues, validationRules, onSubm
     let fieldValue = type === 'checkbox' ? checked : value;
     
     // Validación para campos 'nombre': solo texto y primera letra de cada palabra en mayúscula
-    if (name === 'name') {
+    if (name === 'name' || name === 'city' || name === 'state' || name === 'country' || name === 'institution' || name === 'title' || name === 'fieldOfStudy' || name === 'degree') {
       // Verificar si el valor tiene solo texto (letras y espacios)
       if (/^[A-Za-záéíóúÁÉÍÓÚüÜñÑ\s]*$/.test(value)) {
         // Capitalizar la primera letra de cada palabra

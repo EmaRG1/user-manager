@@ -148,6 +148,8 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 value={formData.startYear}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                min={1950}
+                max={new Date().getFullYear()}
                 className={`px-3 py-2 border ${errors.startYear ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Ej: 2018"
               />
@@ -167,6 +169,8 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 value={formData.endYear}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                min={1950}
+                max={new Date().getFullYear()}
                 disabled={formData.currentlyStudying}
                 className={`px-3 py-2 border ${errors.endYear ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm ${formData.currentlyStudying ? 'bg-gray-100' : ''}`}
                 placeholder={formData.currentlyStudying ? "Actual" : "Ej: 2022"}
