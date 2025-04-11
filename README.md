@@ -50,7 +50,7 @@ npm install
 npm run dev
 ```
 
-4. Abre tu navegador y ve a `http://localhost:5173`
+4. Abre tu navegador y ve a `http://localhost:8080`
 
 ## Uso
 
