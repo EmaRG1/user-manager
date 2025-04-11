@@ -50,7 +50,7 @@ npm install
 npm run dev
 ```
 
-4. Abre tu navegador y ve a `http://localhost:5173`
+4. Abre tu navegador y ve a `http://localhost:8080`
 
 ## Uso
 
@@ -58,11 +58,14 @@ npm run dev
 
 - Usuario Administrador:
 
-  - Email: admin@example.com
+  - Email: admin@admin.com
   - Contraseña: admin123
 
 - Usuario Regular:
-  - Email: user@example.com
+  - Email: user@user.com
+  - Contraseña: user123
+ 
+  - Email: user2@user.com
   - Contraseña: user123
 
 ### Funcionalidades por rol
@@ -95,6 +98,3 @@ src/
   └── main.jsx           # Punto de entrada de la aplicación
 ```
 
-## Despliegue
-
-La aplicación puede desplegarse en cualquier servicio de hosting estático como Vercel, Netlify o GitHub Pages.
