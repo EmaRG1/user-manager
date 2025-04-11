@@ -142,7 +142,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 Año de inicio
               </label>
               <input
-                type="text"
+                type="number"
                 id="startYear"
                 name="startYear"
                 value={formData.startYear}
@@ -161,7 +161,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 Año de finalización
               </label>
               <input
-                type="text"
+                type="number"
                 id="endYear"
                 name="endYear"
                 value={formData.endYear}
