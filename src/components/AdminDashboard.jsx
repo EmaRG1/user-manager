@@ -42,7 +42,6 @@ export default function AdminDashboard() {
         let studies = 0;
         let addresses = 0;
 
-        // Este enfoque es más eficiente que cargar todos los estudios y direcciones
         for (const userData of usersData) {
           const userStudies = await studiesApi.getByUserId(userData.id, token);
           const userAddresses = await addressesApi.getByUserId(userData.id, token);

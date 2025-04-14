@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { studiesApi, addressesApi } from '../api/mockApi';
-import StatsCards from './dashboard/StatsCards';
+import UserStats from './dashboard/UserStats';
 import ProfileInfo from './dashboard/ProfileInfo';
 import UserStudies from './dashboard/UserStudies';
 import UserAddresses from './dashboard/UserAddresses';
@@ -51,7 +51,7 @@ export default function UserDashboard() {
           <LoadingSpinner />
         ) : (
           <>
-            <StatsCards userStudies={userStudies} userAddresses={userAddresses} />
+            <UserStats userStudies={userStudies} userAddresses={userAddresses} />
             <ProfileInfo user={user} />
             <UserStudies studies={userStudies} />
             <UserAddresses addresses={userAddresses} />
