@@ -2,11 +2,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import MyProfile from './pages/MyProfile';
 import UserProfile from './pages/UserProfile';
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import './App.css';
 
 // Componente simple de carga
@@ -16,6 +17,18 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Componente para la ruta de login que redirecciona si el usuario ya está autenticado
+const LoginRoute = () => {
+  const { isAuthenticated } = useAuth();
+  
+  // Si el usuario ya está autenticado, redirigir al dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Login />;
+};
+
 function App() {
   return (
     <Router>
@@ -23,8 +36,8 @@ function App() {
         <AuthProvider>
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
-              {/* Ruta pública */}
-              <Route path="/login" element={<Login />} />
+              {/* Ruta de login - redirecciona al dashboard si ya está autenticado */}
+              <Route path="/login" element={<LoginRoute />} />
               
               {/* Ruta protegida para cualquier usuario autenticado */}
               <Route

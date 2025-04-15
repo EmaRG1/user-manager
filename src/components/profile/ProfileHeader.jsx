@@ -3,7 +3,6 @@ import { Menu } from 'lucide-react';
 export default function ProfileHeader({ user, setSidebarOpen }) {
   return (
     <>
-      {/* Menú hamburguesa para móviles */}
       <div className="md:hidden top-0 z-10 sticky flex items-center bg-white px-4 py-3 border-gray-200 border-b">
         <button
           onClick={() => setSidebarOpen(true)}
