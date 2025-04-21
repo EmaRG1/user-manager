@@ -1,7 +1,7 @@
 import { Menu, ArrowLeft } from 'lucide-react';
 import Sidebar from './sidebar/Sidebar';
 import ProfileTabs from '../profile/ProfileTabs';
-import LoadingSpinner from '../ui/LoadingSpinner';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 /**
  * Componente de layout para las páginas de perfil
