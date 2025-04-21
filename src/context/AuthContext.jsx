@@ -1,12 +1,8 @@
 import { createContext, useContext, useReducer, useEffect, useState } from 'react';
-import { decodeToken, verifyToken, getTokenRemainingTime } from '../utils/jwt';
-import { authApi } from '../api/mockApi';
+import { getTokenRemainingTime, verifyToken } from '../utils/jwt';
+import { authService } from '../services';
 
 const AuthContext = createContext();
-
-// clave para guardar el token en sessionStorage
-const TOKEN_KEY = 'auth_token';
-const USER_DATA_KEY = 'user_data';
 
 const initialState = {
   user: null,
@@ -44,8 +40,8 @@ export function AuthProvider({ children }) {
   // Al cargar el componente, verificar si hay un token guardado
   useEffect(() => {
     const initAuth = async () => {
-      // Cargar datos desde sessionStorage
-      const authState = loadUserData();
+      // Cargar datos desde sessionStorage a través del servicio
+      const authState = authService.loadSession();
       
       // Si hay un estado válido, actualizar el contexto
       if (authState.isAuthenticated) {
@@ -87,69 +83,14 @@ export function AuthProvider({ children }) {
     return () => clearInterval(checkTokenInterval); // salgo del intervalo
   }, [state.token]);
 
-  // Guardar datos del usuario y token en sessionStorage
-  const saveUserData = (userData, token) => {
-    sessionStorage.setItem(TOKEN_KEY, token);
-    sessionStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-  };
-
-  // Cargar datos del usuario y token desde sessionStorage
-  const loadUserData = () => {
-    const token = sessionStorage.getItem(TOKEN_KEY);
-    const userData = sessionStorage.getItem(USER_DATA_KEY);
-
-    if (token && userData) {
-      try {
-        // Verificar que el token sea válido
-        if (verifyToken(token)) {
-          const parsedUserData = JSON.parse(userData);
-          return {
-            isAuthenticated: true,
-            token,
-            user: parsedUserData,
-            role: parsedUserData.role
-          };
-        }
-      } catch (error) {
-        console.error('Error al procesar los datos de sesión:', error);
-      }
-    }
-    return initialState;
-  };
-
-  // Borrar datos del usuario y token de sessionStorage
-  const clearUserData = () => {
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(USER_DATA_KEY);
-  };
-
   // Iniciar sesión con token y datos de usuario
   const login = async ({ token, user }) => {
     try {
-      if (!token || !user) {
-        throw new Error('Datos de autenticación incompletos');
-      }
-
-      // Decodificar el token para obtener la información del usuario
-      const decodedToken = decodeToken(token);
-
-      if (!decodedToken) {
-        throw new Error('Token inválido');
-      }
-
-      // Extraer estudios y direcciones del token si están disponibles
-      const studies = decodedToken.studies || [];
-      const addresses = decodedToken.addresses || [];
-
-      // Asegurar que el usuario tenga los estudios y direcciones del token
-      const enrichedUser = {
-        ...user,
-        studies,
-        addresses
-      };
-
-      // Guardar token y datos de usuario en sessionStorage
-      saveUserData(enrichedUser, token);
+      // Procesar y enriquecer datos de usuario a través del servicio
+      const enrichedUser = authService.processUserData(token, user);
+      
+      // Guardar token y datos de usuario en sessionStorage a través del servicio
+      authService.saveSession(enrichedUser, token);
 
       // Actualizar el estado de autenticación
       dispatch({
@@ -170,15 +111,15 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      // Llamar a la API mock para logout (opcional)
+      // Llamar al servicio de autenticación para logout
       if (state.token) {
-        await authApi.logout();
+        await authService.logout();
       }
     } catch (error) {
       console.error('Error en logout:', error);
     } finally {
-      // elimino el token y los datos de usuario de sessionStorage
-      clearUserData();
+      // elimino el token y los datos de usuario de sessionStorage a través del servicio
+      authService.clearSession();
       
       // actualizo el estado
       dispatch({ type: 'LOGOUT' });
@@ -194,11 +135,10 @@ export function AuthProvider({ children }) {
     
     // Actualizar datos guardados en sessionStorage
     try {
-      const userDataStr = sessionStorage.getItem(USER_DATA_KEY);
-      if (userDataStr) {
-        const storedUser = JSON.parse(userDataStr);
-        const updatedUser = { ...storedUser, ...userData };
-        sessionStorage.setItem(USER_DATA_KEY, JSON.stringify(updatedUser));
+      const existingSession = authService.loadSession();
+      if (existingSession.isAuthenticated) {
+        const updatedUser = { ...existingSession.user, ...userData };
+        authService.saveSession(updatedUser, existingSession.token);
       }
     } catch (error) {
       console.error('Error al actualizar datos de usuario en sessionStorage:', error);

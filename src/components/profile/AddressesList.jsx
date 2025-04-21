@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { addressesApi } from '../../api/mockApi';
+import { addressesService } from '../../services';
 import AddressModal from '../AddressModal';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../ConfirmDialog';
@@ -29,17 +29,12 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
   // Manejar el guardado de una dirección
   const handleSaveAddress = async (addressData) => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
       if (currentAddress) {
-        // Editar dirección existente
-        const updatedAddress = await addressesApi.update(currentAddress.id, {
+        // Editar dirección existente utilizando el servicio
+        const updatedAddress = await addressesService.update(currentAddress.id, {
           ...addressData,
           userId: user.id
-        }, token);
+        });
         
         // Actualizar localmente
         setUserAddressesList(prevAddresses => 
@@ -49,11 +44,11 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
         );
         showToast('Dirección actualizada con éxito', 'success');
       } else {
-        // Agregar nueva dirección
-        const newAddress = await addressesApi.create({
+        // Agregar nueva dirección utilizando el servicio
+        const newAddress = await addressesService.create({
           ...addressData,
           userId: user.id
-        }, token);
+        });
         
         // Añadir a la lista local
         setUserAddressesList(prevAddresses => [...prevAddresses, newAddress]);
@@ -77,13 +72,8 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
   // Manejar la eliminación de dirección tras la confirmación
   const handleConfirmDelete = async () => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
-      // Eliminar dirección
-      await addressesApi.delete(confirmDialog.addressId, token);
+      // Eliminar dirección utilizando el servicio
+      await addressesService.delete(confirmDialog.addressId);
       
       // Actualizar localmente
       setUserAddressesList(prevAddresses => 

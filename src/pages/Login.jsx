@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authApi } from '../api/mockApi';
+import { authService } from '../services';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -17,8 +17,8 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // Llamo a la API mock para la autenticación
-      const { token, user } = await authApi.login(email, password);
+      // Llamo al servicio de autenticación
+      const { token, user } = await authService.login(email, password);
 
       // Inicio sesión con el token y la info del usuario
       const loginSuccess = await login({ token, user });

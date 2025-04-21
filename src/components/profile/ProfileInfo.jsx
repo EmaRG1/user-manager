@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Edit, Save } from 'lucide-react';
-import { usersApi } from '../../api/mockApi';
+import { usersService } from '../../services';
 import { useToast } from '../../context/ToastContext';
 import useFormValidation from '../../hooks/useFormValidation';
 
@@ -33,13 +33,8 @@ export default function ProfileInfo({ user, role, updateUser }) {
     
     setIsSavingProfile(true);
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
-      // Actualizar perfil en la API
-      const updatedUser = await usersApi.update(user.id, formData, token);
+      // Actualizar perfil utilizando el servicio
+      const updatedUser = await usersService.update(user.id, formData);
       
       // Actualizar el contexto de autenticación
       updateUser(updatedUser);

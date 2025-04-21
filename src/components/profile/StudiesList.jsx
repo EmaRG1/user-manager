@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { studiesApi } from '../../api/mockApi';
+import { studiesService } from '../../services';
 import StudyModal from '../StudyModal';
 import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../ConfirmDialog';
@@ -26,17 +26,12 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
 
   const handleSaveStudy = async (studyData) => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
       if (currentStudy) {
-        // Editar formación existente
-        const updatedStudy = await studiesApi.update(currentStudy.id, {
+        // Editar formación existente utilizando el servicio
+        const updatedStudy = await studiesService.update(currentStudy.id, {
           ...studyData,
           userId: user.id
-        }, token);
+        });
         
         setUserStudiesList(prevStudies => 
           prevStudies.map(study => 
@@ -45,11 +40,11 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
         );
         showToast('Formación actualizada con éxito', 'success');
       } else {
-        // Agregar nueva formación
-        const newStudy = await studiesApi.create({
+        // Agregar nueva formación utilizando el servicio
+        const newStudy = await studiesService.create({
           ...studyData,
           userId: user.id
-        }, token);
+        });
         
         setUserStudiesList(prevStudies => [...prevStudies, newStudy]);
         showToast('Formación creada con éxito', 'success');
@@ -72,13 +67,8 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
   // Manejar la eliminación de formación tras la confirmación
   const handleConfirmDelete = async () => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
-      // Eliminar formación
-      await studiesApi.delete(confirmDialog.studyId, token);
+      // Eliminar formación utilizando el servicio
+      await studiesService.delete(confirmDialog.studyId);
       
       // Actualizar localmente
       setUserStudiesList(prevStudies => 

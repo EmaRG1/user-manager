@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Menu, ArrowLeft } from 'lucide-react';
 import Sidebar from '../components/sidebar/Sidebar';
 import useSidebarState from '../hooks/useSidebarState';
-import { studiesApi, addressesApi, usersApi } from '../api/mockApi';
+import { studiesService, addressesService, usersService } from '../services';
 
 // Componentes existentes
 import ProfileTabs from '../components/profile/ProfileTabs';
@@ -31,20 +31,15 @@ export default function UserProfile() {
     }
   }, [role, navigate]);
 
-  // Cargar datos del usuario desde la API
+  // Cargar datos del usuario desde los servicios
   useEffect(() => {
     const loadUserData = async () => {
       if (!userId) return;
       
       setIsLoading(true);
       try {
-        const token = sessionStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró token de autenticación');
-        }
-
-        // Cargar datos del usuario
-        const userData = await usersApi.getById(Number(userId), token);
+        // Cargar datos del usuario mediante el servicio
+        const userData = await usersService.getById(Number(userId));
         setUser(userData);
         
         // Si los estudios y direcciones ya vienen en userData, los usamos directamente
@@ -55,9 +50,9 @@ export default function UserProfile() {
           return;
         }
         
-        // Si no están en userData, los cargamos de la API
-        const addresses = await addressesApi.getByUserId(Number(userId), token);
-        const studies = await studiesApi.getByUserId(Number(userId), token);
+        // Si no están en userData, los cargamos de los servicios
+        const addresses = await addressesService.getByUserId(Number(userId));
+        const studies = await studiesService.getByUserId(Number(userId));
         
         setUserAddressesList(addresses);
         setUserStudiesList(studies);

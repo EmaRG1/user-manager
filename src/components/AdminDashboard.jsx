@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { usersApi, studiesApi, addressesApi } from '../api/mockApi';
+import { usersService, studiesService, addressesService, authService } from '../services';
 import UserModal from './UserModal';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
@@ -11,7 +11,7 @@ import { useToast } from '../context/ToastContext';
 import ConfirmDialog from './ConfirmDialog';
 
 export default function AdminDashboard() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, logout } = useAuth();
   const [users, setUsers] = useState([]);
   const [totalStudies, setTotalStudies] = useState(0);
   const [totalAddresses, setTotalAddresses] = useState(0);
@@ -29,13 +29,8 @@ export default function AdminDashboard() {
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const token = sessionStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró token de autenticación');
-        }
-
-        // Cargar usuarios
-        const usersData = await usersApi.getAll(token);
+        // Cargar usuarios utilizando el servicio de usuarios
+        const usersData = await usersService.getAll();
         setUsers(usersData);
 
         // Calcular totales de estudios y direcciones
@@ -43,8 +38,8 @@ export default function AdminDashboard() {
         let addresses = 0;
 
         for (const userData of usersData) {
-          const userStudies = await studiesApi.getByUserId(userData.id, token);
-          const userAddresses = await addressesApi.getByUserId(userData.id, token);
+          const userStudies = await studiesService.getByUserId(userData.id);
+          const userAddresses = await addressesService.getByUserId(userData.id);
           
           studies += userStudies.length;
           addresses += userAddresses.length;
@@ -80,14 +75,9 @@ export default function AdminDashboard() {
   // Manejar el guardado de los datos del usuario (crear o editar)
   const handleSaveUser = async (userData) => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
       if (selectedUser) {
-        // Editar usuario existente
-        const updatedUser = await usersApi.update(selectedUser.id, userData, token);
+        // Editar usuario existente a través del servicio
+        const updatedUser = await usersService.update(selectedUser.id, userData);
         
         // Actualizar la lista de usuarios
         setUsers(prevUsers => 
@@ -95,8 +85,8 @@ export default function AdminDashboard() {
         );
         showToast('Usuario actualizado con éxito', 'success');
       } else {
-        // Crear nuevo usuario
-        const newUser = await usersApi.create(userData, token);
+        // Crear nuevo usuario a través del servicio
+        const newUser = await usersService.create(userData);
         
         // Añadir a la lista de usuarios
         setUsers(prevUsers => [...prevUsers, newUser]);
@@ -120,11 +110,12 @@ export default function AdminDashboard() {
   // Manejar la eliminación de usuario tras la confirmación
   const handleConfirmDelete = async () => {
     try {
-      const token = sessionStorage.getItem('auth_token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-      await usersApi.delete(confirmDialog.userId, token);
+      const isCurrentUser = confirmDialog.userId === currentUser.id;
+
+      // Eliminar usuario a través del servicio
+      await usersService.delete(confirmDialog.userId);
+      
+      // Actualizar la lista de usuarios y contadores
       setUsers(prevUsers => prevUsers.filter(u => u.id !== confirmDialog.userId));
       setTotalStudies(prevTotal => {
         const userStudies = users.find(u => u.id === confirmDialog.userId)?.studies || 0;
@@ -134,13 +125,19 @@ export default function AdminDashboard() {
         const userAddresses = users.find(u => u.id === confirmDialog.userId)?.addresses || 0;
         return prevTotal - userAddresses;
       });
-      if (confirmDialog.userId === currentUser.id) {
+      
+      setConfirmDialog({ isOpen: false, userId: null });
+      
+      // Si el usuario elimina su propia cuenta
+      if (isCurrentUser) {
+        await logout(); // Usar el método de logout del contexto de autenticación
+        showToast('Su cuenta ha sido eliminada correctamente', 'info');
         navigate('/login');
+      } else {
+        showToast('Usuario eliminado con éxito', 'info');
       }
-      showToast('Usuario eliminado con éxito', 'info');
     } catch (error) {
       showToast('Error al eliminar usuario', 'error');
-    } finally {
       setConfirmDialog({ isOpen: false, userId: null });
     }
   };

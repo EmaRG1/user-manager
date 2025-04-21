@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/sidebar/Sidebar';
 import useSidebarState from '../hooks/useSidebarState';
-import { studiesApi, addressesApi } from '../api/mockApi';
+import { studiesService, addressesService } from '../services';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import ProfileTabs from '../components/profile/ProfileTabs';
 import ProfileInfo from '../components/profile/ProfileInfo';
@@ -18,21 +18,16 @@ export default function MyProfile() {
   const [userAddressesList, setUserAddressesList] = useState([]);
   const [userStudiesList, setUserStudiesList] = useState([]);
 
-  // Cargar datos del usuario desde la API
+  // Cargar datos del usuario desde los servicios
   useEffect(() => {
     const loadUserData = async () => {
       if (!user || !user.id) return;
       
       setIsLoading(true);
       try {
-        const token = sessionStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró token de autenticación');
-        }
-
-        // Cargar datos del usuario
-        const addresses = await addressesApi.getByUserId(user.id, token);
-        const studies = await studiesApi.getByUserId(user.id, token);
+        // Usar los servicios para obtener direcciones y estudios
+        const addresses = await addressesService.getByUserId(user.id);
+        const studies = await studiesService.getByUserId(user.id);
         
         setUserAddressesList(addresses);
         setUserStudiesList(studies);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { studiesApi, addressesApi } from '../api/mockApi';
+import { studiesService, addressesService } from '../services';
 import UserStats from './dashboard/UserStats';
 import ProfileInfo from './dashboard/ProfileInfo';
 import UserStudies from './dashboard/UserStudies';
@@ -19,13 +19,8 @@ export default function UserDashboard() {
       
       setIsLoading(true);
       try {
-        const token = sessionStorage.getItem('auth_token');
-        if (!token) {
-          throw new Error('No se encontró token de autenticación');
-        }
-
-        const studies = await studiesApi.getByUserId(user.id, token);
-        const addresses = await addressesApi.getByUserId(user.id, token);
+        const studies = await studiesService.getByUserId(user.id);
+        const addresses = await addressesService.getByUserId(user.id);
         
         setUserStudies(studies);
         setUserAddresses(addresses);
