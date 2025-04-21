@@ -5,7 +5,7 @@ import UserStats from './UserStats';
 import ProfileInfo from '../../profile/ProfileInfo';
 import UserStudies from '../UserStudies';
 import UserAddresses from '../UserAddresses';
-import LoadingSpinner from '../../ui/LoadingSpinner';
+import LoadingSpinner from '../../common/LoadingSpinner';
 
 export default function UserDashboard() {
   const { user, updateUser } = useAuth();

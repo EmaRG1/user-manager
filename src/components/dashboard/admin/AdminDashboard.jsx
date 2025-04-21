@@ -5,7 +5,7 @@ import AdminStats from './AdminStats';
 import UsersTable from './UsersTable';
 import ConfirmDialog from '../../ConfirmDialog';
 import useAdminDashboard from '../../../hooks/useAdminDashboard';
-import LoadingSpinner from '../../ui/LoadingSpinner';
+import LoadingSpinner from '../../common/LoadingSpinner';
 export default function AdminDashboard() {
   const { user: currentUser, logout } = useAuth();
   
