@@ -83,18 +83,42 @@ npm run dev
 - Añadir y editar sus propios estudios
 - Añadir y editar sus propias direcciones
 
-## Estructura del proyecto
+## Funcionamiento
 
-```
-src/
-  ├── api/               # Mock API para simular backend
-  ├── components/        # Componentes reutilizables
-  │   ├── dashboard/     # Componentes del panel de control
-  │   └── profile/       # Componentes del perfil de usuario
-  ├── context/           # Proveedores de contexto
-  ├── hooks/             # Hooks personalizados
-  ├── pages/             # Componentes de página
-  ├── App.jsx            # Componente principal de la aplicación
-  └── main.jsx           # Punto de entrada de la aplicación
-```
+- Panel de control de admin, donde se puede crear un usuario nuevo o modificar uno existente
+  
+![image](https://github.com/user-attachments/assets/7dabdebf-fb39-4bf7-aaa0-d8182e1dfc53)
+
+- Modal con validaciones para crear un usuario
+  
+![image](https://github.com/user-attachments/assets/698684d6-0511-4ac6-a709-d684e8828f62)
+
+
+- Mensaje de éxito al crear/eliminar un usuario
+- Estado de carga para evitar multiples envios
+- Validaciones para evitar emails duplicados
+  
+![image](https://github.com/user-attachments/assets/d386e9bd-b38e-4cdb-8ebf-3e6f75ae97b8)
+
+
+
+- Perfil del usuario, version mobile completamente responiva
+  
+![image](https://github.com/user-attachments/assets/12b893e1-5c2e-49f8-84fd-ef12746eaa14)
+
+![image](https://github.com/user-attachments/assets/ba487769-9745-491a-a830-4e4202ccff7f)
+
+
+- Añadir dirección
+  
+![image](https://github.com/user-attachments/assets/2b34f34a-a75b-4c58-9746-d8f5af261a8a)
+
+
+- Añadir formación
+  
+![image](https://github.com/user-attachments/assets/f8a0227f-004f-4d71-af35-fdcbe0a6d2de)
+
+## Estructura
+
+Se separó la lógica de red y la lógica de sesión en distintos servicios, separando responsabilidades, siguiendo el principio de responsabilidad única y creando abstracciones, siguiendo los principios SOLID.
 
