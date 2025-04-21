@@ -2,11 +2,10 @@ import { verifyToken } from '../utils/jwt';
 
 /**
  * Servicio para manejar peticiones HTTP
- * Abstrae la lógica común para todas las llamadas API
  */
 class HttpService {
   /**
-   * Simula un delay para imitar latencia de red
+   * Simula un delay para imitar lag
    * @param {number} ms - Milisegundos a esperar
    * @returns {Promise<void>}
    */

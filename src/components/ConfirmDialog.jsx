@@ -8,7 +8,8 @@ const ConfirmDialog = ({
   cancelText = "Cancelar",
   type = "warning",
   onConfirm,
-  onCancel
+  onCancel,
+  isSubmitting = false
 }) => {
   if (!isOpen) return null;
 
@@ -60,17 +61,19 @@ const ConfirmDialog = ({
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 type="button"
-                className="bg-white hover:bg-gray-50 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-gray-700"
+                className="bg-white hover:bg-gray-50 disabled:opacity-50 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-gray-700"
                 onClick={onCancel}
+                disabled={isSubmitting}
               >
                 {cancelText}
               </button>
               <button
                 type="button"
-                className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${getButtonColor()}`}
+                className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${getButtonColor()} disabled:opacity-50`}
                 onClick={onConfirm}
+                disabled={isSubmitting}
               >
-                {confirmText}
+                {isSubmitting ? 'Procesando...' : confirmText}
               </button>
             </div>
           </div>

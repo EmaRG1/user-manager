@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { studiesService, addressesService } from '../services';
-import UserStats from './dashboard/UserStats';
-import ProfileInfo from './dashboard/ProfileInfo';
-import UserStudies from './dashboard/UserStudies';
-import UserAddresses from './dashboard/UserAddresses';
-import LoadingSpinner from './LoadingSpinner';
+import { useAuth } from '../../../context/AuthContext';
+import { studiesService, addressesService } from '../../../services';
+import UserStats from './UserStats';
+import ProfileInfo from '../../profile/ProfileInfo';
+import UserStudies from '../UserStudies';
+import UserAddresses from '../UserAddresses';
+import LoadingSpinner from '../../ui/LoadingSpinner';
 
 export default function UserDashboard() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [userStudies, setUserStudies] = useState([]);
   const [userAddresses, setUserAddresses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +47,7 @@ export default function UserDashboard() {
         ) : (
           <>
             <UserStats userStudies={userStudies} userAddresses={userAddresses} />
-            <ProfileInfo user={user} />
+            <ProfileInfo user={user} role={user.role} updateUser={updateUser} />
             <UserStudies studies={userStudies} />
             <UserAddresses addresses={userAddresses} />
           </>

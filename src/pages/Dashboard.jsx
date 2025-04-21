@@ -1,9 +1,9 @@
 import { useAuth } from '../context/AuthContext';
 import { Menu } from 'lucide-react';
-import AdminDashboard from '../components/AdminDashboard';
-import UserDashboard from '../components/UserDashboard';
-import Sidebar from '../components/sidebar/Sidebar';
-import useSidebarState from '../hooks/useSidebarState';
+import AdminDashboard from '../components/dashboard/admin/AdminDashboard';
+import UserDashboard from '../components/dashboard/user/UserDashboard';
+import Sidebar from '../components/layout/sidebar/Sidebar';
+import useSidebarState from '../hooks/common/useSidebarState';
 
 export default function Dashboard() {
   const { role } = useAuth();

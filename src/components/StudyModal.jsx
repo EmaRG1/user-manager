@@ -1,7 +1,7 @@
-import Modal from './Modal';
-import useFormValidation from '../hooks/useFormValidation';
+import Modal from './common/Modal';
+import useFormValidation from '../hooks/common/useFormValidation';
 
-export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
+export default function StudyModal({ isOpen, onClose, onSave, study = null, isSaving = false }) {
   const initialValues = {
     institution: study?.institution || '',
     title: study?.title || '',
@@ -38,7 +38,6 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
       ...formData,
       id: study?.id || Date.now() // Generar ID si es nueva formación
     });
-    onClose();
   };
 
   const { 
@@ -58,7 +57,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
     <Modal
       title={study ? "Editar Formación" : "Añadir Formación"}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={isSaving ? undefined : onClose}
     >
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
@@ -74,6 +73,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
               value={formData.institution}
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={isSaving}
               className={`px-3 py-2 border ${errors.institution ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder="Nombre de la institución"
             />
@@ -94,6 +94,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
               value={formData.title}
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={isSaving}
               className={`px-3 py-2 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder="Título obtenido"
             />
@@ -114,6 +115,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 name="degree"
                 value={formData.degree}
                 onChange={handleChange}
+                disabled={isSaving}
                 className={`px-3 py-2 border border-gray-300 rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Ej: Licenciatura, Máster"
               />
@@ -129,6 +131,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 name="fieldOfStudy"
                 value={formData.fieldOfStudy}
                 onChange={handleChange}
+                disabled={isSaving}
                 className={`px-3 py-2 border border-gray-300 rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Ej: Informática, Economía"
               />
@@ -148,6 +151,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 value={formData.startYear}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={isSaving}
                 min={1950}
                 max={new Date().getFullYear()}
                 className={`px-3 py-2 border ${errors.startYear ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
@@ -169,9 +173,9 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
                 value={formData.endYear}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={formData.currentlyStudying || isSaving}
                 min={1950}
                 max={new Date().getFullYear()}
-                disabled={formData.currentlyStudying}
                 className={`px-3 py-2 border ${errors.endYear ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm ${formData.currentlyStudying ? 'bg-gray-100' : ''}`}
                 placeholder={formData.currentlyStudying ? "Actual" : "Ej: 2022"}
               />
@@ -189,6 +193,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
               name="currentlyStudying"
               checked={formData.currentlyStudying}
               onChange={handleChange}
+              disabled={isSaving}
               className="border-gray-300 rounded w-4 h-4 text-black"
             />
             <label htmlFor="currentlyStudying" className="block ml-2 text-gray-700 text-sm">
@@ -207,6 +212,7 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
               value={formData.description}
               onChange={handleChange}
               rows="4"
+              disabled={isSaving}
               className="px-3 py-2 border border-gray-300 rounded-md w-full text-gray-900 text-sm"
               placeholder="Descripción o detalles adicionales (opcional)"
             ></textarea>
@@ -217,15 +223,17 @@ export default function StudyModal({ isOpen, onClose, onSave, study = null }) {
           <button
             type="button"
             onClick={onClose}
-            className="hover:bg-gray-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
+            disabled={isSaving}
+            className="hover:bg-gray-50 disabled:opacity-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="bg-black hover:bg-gray-800 px-4 py-2 rounded-md font-medium text-white text-sm"
+            disabled={isSaving}
+            className="bg-black hover:bg-gray-800 disabled:opacity-50 px-4 py-2 rounded-md font-medium text-white text-sm"
           >
-            {study ? 'Guardar Cambios' : 'Guardar Formación'}
+            {isSaving ? 'Guardando...' : study ? 'Guardar Cambios' : 'Guardar Formación'}
           </button>
         </div>
       </form>

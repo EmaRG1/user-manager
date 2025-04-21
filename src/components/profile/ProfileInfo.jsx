@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Edit, Save } from 'lucide-react';
 import { usersService } from '../../services';
 import { useToast } from '../../context/ToastContext';
-import useFormValidation from '../../hooks/useFormValidation';
+import useFormValidation from '../../hooks/common/useFormValidation';
 
 export default function ProfileInfo({ user, role, updateUser }) {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -44,7 +44,13 @@ export default function ProfileInfo({ user, role, updateUser }) {
       showToast('Perfil actualizado con éxito', 'success');
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
-      showToast(`Error: ${error.message}`, 'error');
+      
+      // Mostrar mensaje específico si el email ya existe
+      if (error.message && error.message.includes('Ya existe un usuario con este correo')) {
+        showToast('Ya existe un usuario con este correo electrónico', 'error');
+      } else {
+        showToast(`Error: ${error.message || 'Error desconocido'}`, 'error');
+      }
     } finally {
       setIsSavingProfile(false);
     }

@@ -123,6 +123,9 @@ export function AuthProvider({ children }) {
       
       // actualizo el estado
       dispatch({ type: 'LOGOUT' });
+      
+      // Redireccionar al login inmediatamente
+      window.location.href = '/login';
     }
   };
 

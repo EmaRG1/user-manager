@@ -1,92 +1,37 @@
-import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { studiesService } from '../../services';
 import StudyModal from '../StudyModal';
-import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../ConfirmDialog';
+import useEntityCRUD from '../../hooks/data/useEntityCRUD';
 
 export default function StudiesList({ user, userStudiesList, setUserStudiesList }) {
-  const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
-  const [currentStudy, setCurrentStudy] = useState(null);
-  const { showToast } = useToast();
-  const [confirmDialog, setConfirmDialog] = useState({
-    isOpen: false,
-    studyId: null
+  // Usar el hook genérico para operaciones CRUD con mensajes personalizados
+  const {
+    currentItem: currentStudy,
+    isModalOpen: isStudyModalOpen,
+    confirmDialog,
+    handleAddItem: handleAddStudy,
+    handleEditItem: handleEditStudy,
+    handleSaveItem: handleSaveStudy,
+    openDeleteConfirmation,
+    handleConfirmDelete,
+    handleCancelDelete,
+    setIsModalOpen: setIsStudyModalOpen,
+    isSaving
+  } = useEntityCRUD({
+    entities: userStudiesList,
+    setEntities: setUserStudiesList,
+    service: studiesService,
+    userId: user.id,
+    messages: {
+      createSuccess: 'Formación creada con éxito',
+      updateSuccess: 'Formación actualizada con éxito',
+      deleteSuccess: 'Formación eliminada con éxito',
+      createError: 'Error al crear formación',
+      updateError: 'Error al actualizar formación',
+      deleteError: 'Error al eliminar formación'
+    }
   });
-
-  const handleAddStudy = () => {
-    setCurrentStudy(null);
-    setIsStudyModalOpen(true);
-  };
-
-  const handleEditStudy = (study) => {
-    setCurrentStudy(study);
-    setIsStudyModalOpen(true);
-  };
-
-  const handleSaveStudy = async (studyData) => {
-    try {
-      if (currentStudy) {
-        // Editar formación existente utilizando el servicio
-        const updatedStudy = await studiesService.update(currentStudy.id, {
-          ...studyData,
-          userId: user.id
-        });
-        
-        setUserStudiesList(prevStudies => 
-          prevStudies.map(study => 
-            study.id === updatedStudy.id ? updatedStudy : study
-          )
-        );
-        showToast('Formación actualizada con éxito', 'success');
-      } else {
-        // Agregar nueva formación utilizando el servicio
-        const newStudy = await studiesService.create({
-          ...studyData,
-          userId: user.id
-        });
-        
-        setUserStudiesList(prevStudies => [...prevStudies, newStudy]);
-        showToast('Formación creada con éxito', 'success');
-      }
-
-      setIsStudyModalOpen(false);
-    } catch (error) {
-      showToast('Error al guardar formación', 'error');
-    }
-  };
-
-  // Abrir diálogo de confirmación para eliminar formación
-  const openDeleteConfirmation = (studyId) => {
-    setConfirmDialog({
-      isOpen: true,
-      studyId
-    });
-  };
-
-  // Manejar la eliminación de formación tras la confirmación
-  const handleConfirmDelete = async () => {
-    try {
-      // Eliminar formación utilizando el servicio
-      await studiesService.delete(confirmDialog.studyId);
-      
-      // Actualizar localmente
-      setUserStudiesList(prevStudies => 
-        prevStudies.filter(study => study.id !== confirmDialog.studyId)
-      );
-      showToast('Formación eliminada con éxito', 'info');
-    } catch (error) {
-      showToast('Error al eliminar formación', 'error');
-    } finally {
-      // Cerrar diálogo de confirmación
-      setConfirmDialog({ isOpen: false, studyId: null });
-    }
-  };
-
-  // Cancelar la eliminación
-  const handleCancelDelete = () => {
-    setConfirmDialog({ isOpen: false, studyId: null });
-  };
 
   return (
     <div>
@@ -148,13 +93,16 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
         </div>
       )}
       
+      {/* Modal para añadir/editar estudios */}
       <StudyModal
         isOpen={isStudyModalOpen}
         onClose={() => setIsStudyModalOpen(false)}
         onSave={handleSaveStudy}
         study={currentStudy}
+        isSaving={isSaving}
       />
 
+      {/* Diálogo de confirmación para eliminar */}
       <ConfirmDialog 
         isOpen={confirmDialog.isOpen}
         title="Eliminar formación"
@@ -164,6 +112,7 @@ export default function StudiesList({ user, userStudiesList, setUserStudiesList 
         type="warning"
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        isSubmitting={confirmDialog.isSubmitting}
       />
     </div>
   );

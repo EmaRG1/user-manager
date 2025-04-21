@@ -1,97 +1,37 @@
-import { useState } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { addressesService } from '../../services';
 import AddressModal from '../AddressModal';
-import { useToast } from '../../context/ToastContext';
 import ConfirmDialog from '../ConfirmDialog';
+import useEntityCRUD from '../../hooks/data/useEntityCRUD';
 
 export default function AddressesList({ user, userAddressesList, setUserAddressesList }) {
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [currentAddress, setCurrentAddress] = useState(null);
-  const { showToast } = useToast();
-  const [confirmDialog, setConfirmDialog] = useState({
-    isOpen: false,
-    addressId: null
+  // Usar el hook genérico para operaciones CRUD con mensajes personalizados
+  const {
+    currentItem: currentAddress,
+    isModalOpen: isAddressModalOpen,
+    confirmDialog,
+    handleAddItem: handleAddAddress,
+    handleEditItem: handleEditAddress,
+    handleSaveItem: handleSaveAddress,
+    openDeleteConfirmation,
+    handleConfirmDelete,
+    handleCancelDelete,
+    setIsModalOpen: setIsAddressModalOpen,
+    isSaving
+  } = useEntityCRUD({
+    entities: userAddressesList,
+    setEntities: setUserAddressesList,
+    service: addressesService,
+    userId: user.id,
+    messages: {
+      createSuccess: 'Dirección creada con éxito',
+      updateSuccess: 'Dirección actualizada con éxito',
+      deleteSuccess: 'Dirección eliminada con éxito',
+      createError: 'Error al crear dirección',
+      updateError: 'Error al actualizar dirección',
+      deleteError: 'Error al eliminar dirección'
+    }
   });
-
-  // Manejar la apertura del modal para agregar dirección
-  const handleAddAddress = () => {
-    setCurrentAddress(null);
-    setIsAddressModalOpen(true);
-  };
-
-  // Manejar la apertura del modal para editar dirección
-  const handleEditAddress = (address) => {
-    setCurrentAddress(address);
-    setIsAddressModalOpen(true);
-  };
-
-  // Manejar el guardado de una dirección
-  const handleSaveAddress = async (addressData) => {
-    try {
-      if (currentAddress) {
-        // Editar dirección existente utilizando el servicio
-        const updatedAddress = await addressesService.update(currentAddress.id, {
-          ...addressData,
-          userId: user.id
-        });
-        
-        // Actualizar localmente
-        setUserAddressesList(prevAddresses => 
-          prevAddresses.map(addr => 
-            addr.id === updatedAddress.id ? updatedAddress : addr
-          )
-        );
-        showToast('Dirección actualizada con éxito', 'success');
-      } else {
-        // Agregar nueva dirección utilizando el servicio
-        const newAddress = await addressesService.create({
-          ...addressData,
-          userId: user.id
-        });
-        
-        // Añadir a la lista local
-        setUserAddressesList(prevAddresses => [...prevAddresses, newAddress]);
-        showToast('Dirección creada con éxito', 'success');
-      }
-      
-      setIsAddressModalOpen(false);
-    } catch (error) {
-      showToast('Error al guardar dirección', 'error');
-    }
-  };
-
-  // Abrir diálogo de confirmación para eliminar dirección
-  const openDeleteConfirmation = (addressId) => {
-    setConfirmDialog({
-      isOpen: true,
-      addressId
-    });
-  };
-
-  // Manejar la eliminación de dirección tras la confirmación
-  const handleConfirmDelete = async () => {
-    try {
-      // Eliminar dirección utilizando el servicio
-      await addressesService.delete(confirmDialog.addressId);
-      
-      // Actualizar localmente
-      setUserAddressesList(prevAddresses => 
-        prevAddresses.filter(addr => addr.id !== confirmDialog.addressId)
-      );
-      showToast('Dirección eliminada con éxito', 'info');
-    } catch (error) {
-      showToast('Error al eliminar dirección', 'error');
-    } finally {
-      // Cerrar diálogo de confirmación
-      setConfirmDialog({ isOpen: false, addressId: null });
-    }
-  };
-
-  // Cancelar la eliminación
-  const handleCancelDelete = () => {
-    setConfirmDialog({ isOpen: false, addressId: null });
-  };
 
   return (
     <div>
@@ -152,6 +92,7 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
         onClose={() => setIsAddressModalOpen(false)}
         onSave={handleSaveAddress}
         address={currentAddress}
+        isSaving={isSaving}
       />
 
       {/* Diálogo de confirmación para eliminar */}
@@ -164,6 +105,7 @@ export default function AddressesList({ user, userAddressesList, setUserAddresse
         type="warning"
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        isSubmitting={confirmDialog.isSubmitting}
       />
     </div>
   );

@@ -1,5 +1,5 @@
-import Modal from './Modal';
-import useFormValidation from '../hooks/useFormValidation';
+import Modal from './common/Modal';
+import useFormValidation from '../hooks/common/useFormValidation';
 
 /**
  * Modal para agregar o editar direcciones
@@ -8,9 +8,10 @@ import useFormValidation from '../hooks/useFormValidation';
  * @param {function} props.onClose - Función para cerrar el modal
  * @param {function} props.onSave - Función para guardar los datos del formulario
  * @param {Object} props.address - Datos de la dirección para editar (opcional)
+ * @param {boolean} props.isSaving - Si se está guardando actualmente
  * @returns {React.ReactNode}
  */
-export default function AddressModal({ isOpen, onClose, onSave, address = null }) {
+export default function AddressModal({ isOpen, onClose, onSave, address = null, isSaving = false }) {
   const initialValues = {
     street: address?.street || '',
     city: address?.city || '',
@@ -42,7 +43,6 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
       ...formData,
       id: address?.id || Date.now() // Generar ID si es nueva dirección
     });
-    onClose();
   };
 
   const { 
@@ -62,7 +62,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
     <Modal
       title={address ? "Editar Dirección" : "Añadir Nueva Dirección"}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={isSaving ? undefined : onClose}
     >
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
@@ -78,6 +78,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
               value={formData.street}
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={isSaving}
               className={`px-3 py-2 border ${errors.street ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder="Calle y número"
             />
@@ -99,6 +100,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
                 value={formData.city}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={isSaving}
                 className={`px-3 py-2 border ${errors.city ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Ciudad"
               />
@@ -118,6 +120,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
                 value={formData.state}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={isSaving}
                 className={`px-3 py-2 border ${errors.state ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Estado o provincia"
               />
@@ -140,6 +143,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
                 value={formData.zipCode}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={isSaving}
                 className={`px-3 py-2 border ${errors.zipCode ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
                 placeholder="Código postal"
               />
@@ -159,6 +163,7 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
                 value={formData.country}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                disabled={isSaving}
                 className={`px-3 py-2 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
                 placeholder="País"
               />
@@ -174,15 +179,17 @@ export default function AddressModal({ isOpen, onClose, onSave, address = null }
           <button
             type="button"
             onClick={onClose}
-            className="hover:bg-gray-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
+            disabled={isSaving}
+            className="hover:bg-gray-50 disabled:opacity-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="bg-black hover:bg-gray-800 px-4 py-2 rounded-md font-medium text-white text-sm"
+            disabled={isSaving}
+            className="bg-black hover:bg-gray-800 disabled:opacity-50 px-4 py-2 rounded-md font-medium text-white text-sm"
           >
-            {address ? 'Guardar Cambios' : 'Guardar Dirección'}
+            {isSaving ? 'Guardando...' : address ? 'Guardar Cambios' : 'Guardar Dirección'}
           </button>
         </div>
       </form>

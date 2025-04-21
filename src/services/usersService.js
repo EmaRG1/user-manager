@@ -52,6 +52,19 @@ class UsersService {
   }
   
   /**
+   * Verifica si un email ya existe en la base de datos
+   * @param {string} email - Email a verificar
+   * @param {number} excludeUserId - ID del usuario a excluir de la verificación (para updates)
+   * @returns {Promise<boolean>} True si el email ya existe
+   */
+  async emailExists(email, excludeUserId = null) {
+    await httpService.delay(100);
+    return users.some(user => 
+      user.email === email && (excludeUserId === null || user.id !== excludeUserId)
+    );
+  }
+  
+  /**
    * Crea un nuevo usuario (solo admin)
    * @param {Object} userData - Datos del nuevo usuario
    * @returns {Promise<Object>} Usuario creado
@@ -60,6 +73,11 @@ class UsersService {
     const token = httpService.getAuthToken();
     await httpService.delay(300);
     await httpService.validateToken(token);
+    
+    // Verificar si el email ya existe
+    if (await this.emailExists(userData.email)) {
+      throw new Error('Ya existe un usuario con este correo electrónico');
+    }
     
     // Generar nuevo ID
     const newId = Math.max(...users.map(u => u.id)) + 1;
@@ -90,6 +108,13 @@ class UsersService {
     const userIndex = users.findIndex(u => u.id === id);
     if (userIndex === -1) {
       throw new Error('Usuario no encontrado');
+    }
+    
+    // Verificar si se está cambiando el email y si ya existe
+    if (userData.email && userData.email !== users[userIndex].email) {
+      if (await this.emailExists(userData.email, id)) {
+        throw new Error('Ya existe un usuario con este correo electrónico');
+      }
     }
     
     // Actualizar usuario

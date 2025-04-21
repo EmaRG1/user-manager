@@ -1,7 +1,11 @@
-import Modal from './Modal';
-import useFormValidation from '../hooks/useFormValidation';
+import { useState } from 'react';
+import Modal from './common/Modal';
+import useFormValidation from '../hooks/common/useFormValidation';
 
 export default function UserModal({ isOpen, onClose, onSave, user }) {
+  const [emailExistsError, setEmailExistsError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const initialValues = {
     name: user?.name || '',
     email: user?.email || '',
@@ -33,11 +37,26 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
     }
   };
 
-  const handleFormSubmit = (formData) => {
-    onSave({
-      ...formData,
-      id: user?.id || Date.now()
-    });
+  const handleFormSubmit = async (formData) => {
+    // Limpiar el error de email duplicado antes de enviar
+    setEmailExistsError(null);
+    setIsSubmitting(true);
+    
+    try {
+      await onSave({
+        ...formData,
+        id: user?.id || Date.now()
+      });
+    } catch (error) {
+      // Capturar el error específico de email duplicado
+      if (error.message && error.message.includes('Ya existe un usuario con este correo')) {
+        setEmailExistsError('Ya existe un usuario con este correo electrónico');
+      }
+      // Los demás errores los manejará el componente padre
+      throw error;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const { 
@@ -53,11 +72,24 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
     { userId: user?.id }
   );
 
+  // Limpiar el error de email duplicado cuando se cierra el modal o cambia el valor del email
+  const handleEmailChange = (e) => {
+    if (emailExistsError) {
+      setEmailExistsError(null);
+    }
+    handleChange(e);
+  };
+
   return (
     <Modal
       title={user ? "Editar Usuario" : "Crear Nuevo Usuario"}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={() => {
+        if (!isSubmitting) {
+          setEmailExistsError(null);
+          onClose();
+        }
+      }}
     >
       <form onSubmit={handleSubmit}>
         <div className="space-y-4">
@@ -73,6 +105,7 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
               value={formData.name}
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={isSubmitting}
               className={`px-3 py-2 border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder="Nombre completo"
             />
@@ -90,13 +123,17 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
               id="email"
               name="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={handleEmailChange}
               onBlur={handleBlur}
-              className={`px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
+              disabled={isSubmitting}
+              className={`px-3 py-2 border ${errors.email || emailExistsError ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder="Correo electrónico"
             />
             {errors.email && (
               <p className="mt-1 text-red-500 text-sm">{errors.email}</p>
+            )}
+            {emailExistsError && !errors.email && (
+              <p className="mt-1 text-red-500 text-sm">{emailExistsError}</p>
             )}
           </div>
           
@@ -111,6 +148,7 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
               value={formData.password}
               onChange={handleChange}
               onBlur={handleBlur}
+              disabled={isSubmitting}
               className={`px-3 py-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded-md w-full text-gray-900 text-sm`}
               placeholder={user ? "Dejar en blanco para no cambiar" : "Contraseña"}
             />
@@ -131,6 +169,7 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
               name="role"
               value={formData.role}
               onChange={handleChange}
+              disabled={isSubmitting}
               className="px-3 py-2 border border-gray-300 rounded-md w-full text-gray-900 text-sm"
             >
               <option value="user">Usuario</option>
@@ -142,16 +181,21 @@ export default function UserModal({ isOpen, onClose, onSave, user }) {
         <div className="flex justify-end gap-3 mt-6">
           <button
             type="button"
-            onClick={onClose}
-            className="hover:bg-gray-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
+            onClick={() => {
+              setEmailExistsError(null);
+              onClose();
+            }}
+            disabled={isSubmitting}
+            className="hover:bg-gray-50 disabled:opacity-50 px-4 py-2 border border-gray-300 rounded-md font-medium text-gray-700 text-sm"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            className="bg-black hover:bg-gray-800 px-4 py-2 rounded-md font-medium text-white text-sm"
+            disabled={isSubmitting}
+            className="bg-black hover:bg-gray-800 disabled:opacity-50 px-4 py-2 rounded-md font-medium text-white text-sm"
           >
-            {user ? 'Guardar Cambios' : 'Crear Usuario'}
+            {isSubmitting ? 'Guardando...' : user ? 'Guardar Cambios' : 'Crear Usuario'}
           </button>
         </div>
       </form>
