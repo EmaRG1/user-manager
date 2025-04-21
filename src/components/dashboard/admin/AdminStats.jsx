@@ -1,5 +1,5 @@
-import StatCard from '../../ui/StatCard';
-import StatsGroup from '../../ui/StatsGroup';
+import StatCard from '../../UI/StatCard';
+import StatsGroup from '../../UI/StatsGroup';
 
 export default function AdminStats({ users, totalStudies, totalAddresses }) {
   return (
